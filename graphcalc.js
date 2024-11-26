@@ -1,8 +1,10 @@
 const canvasWidth = 600;
 const canvasHeight = 600;
-const pointCheckInterval = 8;
+const pointCheckInterval = 1;
 
-
+let expressions = [
+  ["factorial(x)", [Math.random() * 255, Math.random() * 255, Math.random() * 255]] // Missing comma fixed here
+];
 
 const movementSpeed = 5;
 
@@ -24,7 +26,7 @@ function createBackgroundLines() {
     stroke(100);
     line(0, viewY, canvasWidth, viewY); // Horizontal line
     line(viewX, 0, viewX, canvasHeight); // Vertical line
-    alert("disabled stripes cuz its gettin too laggy")
+    console.warn("disabled stripes cuz its gettin too laggy")
     return
   }
 
@@ -55,6 +57,8 @@ function drawPoints(graphExpression, r, g, b) {
   let points = [];
   for (let x = (1-calculateTimes/2)*pointCheckInterval; x < calculateTimes/2 * pointCheckInterval; x += pointCheckInterval) {
     // Use the relative x to calculate y
+
+
 
     const y = eval(graphExpression) / zoom; // Ensure factorial uses relative x
 
@@ -94,11 +98,10 @@ function drawGraph() {
   createBackgroundLines();
 
   // Compute and render points and lines
-  let points = drawPoints("x*x", 255, 0, 0);
-  drawLines(points, 255, 0, 0);
-
-  points = drawPoints("x*2", 0, 0, 255);
-  drawLines(points, 0, 0, 255);
+  expressions.forEach(i => {
+    let points = drawPoints(i[0], i[1][0], i[1][1], i[1][2]);
+    drawLines(points, i[1][0], i[1][1], i[1][2]);
+  })
 }
 
 function setup() {
@@ -108,21 +111,21 @@ function setup() {
 function draw() {
   let moved = false;
 
-  if (keys["w"]) {
+  if (keyIsDown(87)) { // 'W' key
     viewY += movementSpeed;
-    moved = true;
+    moved = true
   }
-  if (keys["a"]) {
+  if (keyIsDown(65)) { // 'A' key
     viewX += movementSpeed;
-    moved = true;
+    moved = true
   }
-  if (keys["s"]) {
+  if (keyIsDown(83)) { // 'S' key
     viewY -= movementSpeed;
-    moved = true;
+    moved = true
   }
-  if (keys["d"]) {
+  if (keyIsDown(68)) { // 'D' key
     viewX -= movementSpeed;
-    moved = true;
+    moved = true
   }
 
   if (moved) {
@@ -131,12 +134,21 @@ function draw() {
 }
 
 function keyPressed() {
-  if (key == "ArrowUp") {
-    zoom += 1
+  if (key == "ArrowDown") {
+    if (zoom > 1) {
+      zoom += 1
+    }else if (zoom > 0) {
+      zoom += 0.2
+    }
     drawGraph()
   }
-  if (key == "ArrowDown" && zoom > 1) {
-    zoom += -1
+  if (key == "ArrowUp") {
+    if (zoom > 1) {
+      zoom += -1
+    }else if (zoom-0.2 > 0) {
+      zoom += -0.2
+    }
+    
     drawGraph()
   }
 }
