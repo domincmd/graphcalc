@@ -3,19 +3,19 @@ const canvasHeight = 600;
 const pointCheckInterval = 1;
 
 let expressions = [
-  ["factorial(x)", [Math.random() * 255, Math.random() * 255, Math.random() * 255]] // Missing comma fixed here
+  ["factorial(x)", [Math.random() * 150, Math.random() * 150, Math.random() * 150]] // Missing comma fixed here
 ];
 
 const movementSpeed = 5;
 
-let zoom = 1;
+let zoom = 0.1;
 
 const calculateTimes = 100;
 
 let viewX = canvasWidth/2;
 let viewY = canvasHeight/2;
 
-const pointSize = 4
+const pointSize = 8
 
 function createBackgroundLines() {
   
@@ -30,21 +30,26 @@ function createBackgroundLines() {
     return
   }
 
-  stroke(150);
+  stroke(200);
+  strokeWeight(1);
 
-  const step = pointCheckInterval / zoom;
+  const step = Math.round((pointCheckInterval / zoom) * 100)/100;
   const startX = Math.floor(-viewX / step) * step;
   const startY = Math.floor(-viewY / step) * step;
 
   for (let x = startX; x < canvasWidth - viewX; x += step) {
     line(viewX + x, 0, viewX + x, canvasHeight);
+    //console.log(zoom*100%x)
+    console.log(x)
   }
   for (let y = startY; y < canvasHeight - viewY; y += step) {
     line(0, viewY + y, canvasWidth, viewY + y);
   }
-  stroke(100);
+  stroke(0);
+  strokeWeight(2);
   line(0, viewY, canvasWidth, viewY); // Horizontal line
   line(viewX, 0, viewX, canvasHeight); // Vertical line
+  strokeWeight(1);
 }
 
 function transformPointsTo(x, y) {
@@ -65,7 +70,7 @@ function drawPoints(graphExpression, r, g, b) {
     // Store the relative coordinates
     points.push(createVector(x/zoom, y));
 
-    console.log("X: " + x/zoom + " Y: " + y)
+    //console.log("X: " + x/zoom + " Y: " + y)
 
     // Convert to absolute coordinates for rendering
     const [absoluteX, absoluteY] = transformPointsTo(x/zoom, y);
@@ -134,21 +139,28 @@ function draw() {
 }
 
 function keyPressed() {
-  if (key == "ArrowDown") {
-    if (zoom > 1) {
-      zoom += 1
+  if (key === "ArrowDown") {
+    if (zoom >= 1) {
+      zoom += 1;
+    } else if (zoom > 0.2) {
+      zoom += 0.2;
     }else if (zoom > 0) {
-      zoom += 0.2
+      zoom += 0.05;
     }
-    drawGraph()
-  }
-  if (key == "ArrowUp") {
+    zoom = Math.round(zoom*100)/100
+
+    drawGraph();
+  } else if (key === "ArrowUp") {
     if (zoom > 1) {
-      zoom += -1
-    }else if (zoom-0.2 > 0) {
-      zoom += -0.2
+      zoom -= 1;
+    } else if (zoom > 0.2) {
+      zoom -= 0.2;
+    }else if (zoom > 0.05) {
+      zoom -= 0.05;
     }
-    
-    drawGraph()
+    zoom = Math.round(zoom*100)/100
+
+    drawGraph();
   }
 }
+
